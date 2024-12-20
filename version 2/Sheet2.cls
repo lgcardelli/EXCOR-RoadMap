@@ -1,9 +1,39 @@
 Option Explicit
 
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+
+    Call HighlightRow(Target)    
+    
+End Sub
+
+Sub HighlightRow(ByVal Target As Range)
+'this makes the edit button not visible initially
+    'If Shapes("editbutton").Visible = True Then Shapes("editbutton").Visible = msoFalse
+    'this if statement controls the highlighting of rows when the user selects a row
+    If Not Intersect(Target, Range("B5:N9999")) Is Nothing And Range("B" & Target.Row).Value <> "" Then
+        Range("A4").Value = Target.Row
+    
+    'this will unhide the edit button
+        'With Shapes("editbutton")
+            '.Left = Range("O" & Target.Row).Left + 6
+            '.Top = Range("K" & Target.Row).Top
+            '.Top = Range("O" & Target.Row).Top + (Range("M" & Target.Row).Height - .Height) / 2
+            '.Visible = msoCTrue
+        'End With
+    Else
+        Range("A4").Value = 0
+    End If
+End Sub
 
 Private Sub Worksheet_Change(ByVal Target As Range)
-'this functions handles the changes for the filtering
 
+    'Call DisableCellEvents(Target)
+    Call ApplyFilters(Target)
+
+End Sub
+
+Sub ApplyFilters(ByVal Target As Range)
+'this functions handles the changes for the filtering
     If Target.CountLarge > 1 Then Exit Sub
 
     If Not Intersect(Target, Range("B3:N3")) Is Nothing Then
@@ -65,7 +95,18 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         RunFilter
         End If
     End If
+End Sub
 
+Sub DisableCellEvents(ByVal Target As Range)
+'prevents user from deleting data from the entry list
 
+    If Not Intersect(Target, Range("B5:N9999")) Is Nothing Then
+        If Target.Count >= 1 Then
+            Application.EnableEvents = False
+            Application.Undo
+            Application.EnableEvents = True
+            End
+        End If
+    End If
 
 End Sub
